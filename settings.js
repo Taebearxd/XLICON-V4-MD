@@ -46,13 +46,13 @@ global.location = "India, West Bengal, Kolkata" //ur location
 //new
 global.botname = 'XLICON-V4-MD' //ur bot name
 global.ownernumber = ['917439317360'] //ur owner number, dont add more than one
-global.ownername = '𖥻 𝚩𝚵̸̷𝚫𝐑 ꪜ' //ur owner name
-global.websitex = "https://www.instagram.com/_.bearxd?igsh=MTBiZHJ0eXNsNGJ6OA=="
+global.ownername = '𝝢̶𝝤̸̷⃨⃞⃞⃞⃞⃞⃞⃞⃞⃞⃞⃞⃞⃞𝝞𝗥' //ur owner name
+global.websitex = "https://www.instagram.com/_.noirxd?igsh=MTBiZHJ0eXNsNGJ6OA=="
 global.wagc = "https://chat.whatsapp.com/EZjCgLTJfRd8LHOyVC163u"
 global.themeemoji = '⛩'
 global.wm = "Xlicon Bot Inc."
 global.botscript = 'https://github.com/salmanytofficial/XLICON-V4-MD' //script link
-global.packname = "MΛDΣ BY 𖥻 𝚩𝚵̸̷𝚫𝐑 ꪜ"
+global.packname = "MΛDΣ BY 𝝢̶𝝤̸̷⃨⃞⃞⃞⃞⃞⃞⃞⃞⃞⃞⃞⃞⃞𝝞𝗥"
 global.author = "Don't copy ‼️"
 global.creator = "917439317360@s.whatsapp.net"
 global.xprefix = '.'
