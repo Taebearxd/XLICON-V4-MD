@@ -20191,36 +20191,74 @@ break
 
 
 			// Search Menu
-case 'play':  case 'song': {
-if (!text) return replygcxlicon(`Example : ${prefix + command} anime whatsapp status`)
-try {
-const xliconplaymp3 = require('./lib/ytdl')
-let yts = require("youtube-yts")
-        let search = await yts(text)
-        let anup3k = search.videos[0]
-const pl= await xliconplaymp3.mp3(anup3k.url)
-await XliconBotInc.sendMessage(m.chat,{
-    audio: fs.readFileSync(pl.path),
-    fileName: anup3k.title + '.mp3',
-    mimetype: 'audio/mp4', ptt: true,
-    contextInfo:{
-        externalAdReply:{
-            title:anup3k.title,
-            body: botname,
-            thumbnail: await fetchBuffer(pl.meta.image),
-            sourceUrl: websitex,
-            mediaType:2,
-            mediaUrl:anup3k.url,
-        }
+case 'play':
+case 'song': {
+    if (!text) return replygcxlicon(`Example : ${prefix + command} anime whatsapp status`);
+// Indicate that the bot is processing the request
+    await XliconStickWait(); // Show loading indicator
+    try {
+        const xliconplaymp3 = require('./lib/ytdl');
+        let yts = require("youtube-yts");
+        let search = await yts(text);
+        let anup3k = search.videos[0];
 
-    },
-},{quoted:m})
-await fs.unlinkSync(pl.path)
-}catch{
-	replygcxlicon(`Command will not work on Pannel Use ${prefix}spotify.`)
-	}
+        // First, attempt to download the audio using ytdl
+        const pl = await xliconplaymp3.mp3(anup3k.url);
+        await XliconBotInc.sendMessage(m.chat, {
+            audio: fs.readFileSync(pl.path),
+            fileName: anup3k.title + '.mp3',
+            mimetype: 'audio/mp4',
+            ptt: true,
+            contextInfo: {
+                externalAdReply: {
+                    title: anup3k.title,
+                    body: botname,
+                    thumbnail: await fetchBuffer(pl.meta.image),
+                    sourceUrl: websitex,
+                    mediaType: 2,
+                    mediaUrl: anup3k.url,
+                }
+            },
+        }, { quoted: m });
+        await fs.unlinkSync(pl.path);
+    } catch (e) {
+        // Log the error to the console
+        console.error('Error downloading audio with ytdl:', e);
+
+        // If ytdl fails, fallback to using the API
+        try {
+            let yts = require("yt-search");
+            let search = await yts(text);
+            let anup3k = search.videos[0];
+            let procees = await (await fetch(`https://widipe.com/download/ytdl?url=${anup3k.url}`)).json();
+
+            let doc = {
+                audio: {
+                    url: procees.result.mp3
+                },
+                mimetype: 'audio/mp4',
+                fileName: `${anup3k.title}.mp3`,
+                contextInfo: {
+                    externalAdReply: {
+                        showAdAttribution: true,
+                        mediaType: 2,
+                        mediaUrl: anup3k.url,
+                        title: anup3k.title,
+                        sourceUrl: anup3k.url,
+                        thumbnail: await (await fetchBuffer(anup3k.thumbnail))
+                    }
+                }
+            };
+
+            await XliconBotInc.sendMessage(m.chat, doc, { quoted: m });
+        } catch (err) {
+            // Log the error from the API to the console
+            console.error('Error downloading audio with API:', err);
+            replygcxlicon(`An error occurred: ${err.message}`);
+        }
+    }
+    break;
 }
-break
 
 case 'play2':
 case 'song2': {
@@ -20274,7 +20312,6 @@ case 'song2': {
   }
 }
 break;
-
 
 
                
@@ -20676,64 +20713,126 @@ break;
 case 'ytmp3': case 'ytaudio': case 'ytplayaudio': {
     if (!text) return replygcxlicon(`Example: ${prefix + command} youtube_url`);
     if (!text.includes('youtu')) return replygcxlicon('The URL does not contain results from YouTube!');
-    const hasil = await ytMp3(text);
+    
     XliconStickWait();
     
-    // Reply with all audio information
-    await replygcxlicon(`*🟢 XLICON MD YT AUDIO DOWNLOADER 🟢*\n\n` +
-                        `*🎬 Title:* ${hasil.title}\n` +
-                        `*💾 Size:* ${hasil.size}\n` +
-                        `*👀 Views:* ${hasil.views ? hasil.views.toLocaleString() : "0"}\n` +
-                        `*👍 Likes:* ${hasil.likes ? hasil.likes.toLocaleString() : "0"}\n` +
-                        `*👎 Dislikes:* ${hasil.dislike ? hasil.dislike.toLocaleString() : "0"}\n` +
-                        `*📺 Channel:* ${hasil.channel}\n` +
-                        `*📅 Uploaded On:* ${hasil.uploadDate}\n\n` +
-                        `*💻 SERVER: KALI LINUX*\n\n` +
-                        `*🔻 DOWNLOADED BY XLICON-V4 🔻*`);
-
-    await XliconBotInc.sendMessage(m.chat, {
-        audio: { url: hasil.result },
-        mimetype: 'audio/mpeg',
-        contextInfo: {
-            externalAdReply: {
-                title: hasil.title,
-                body: hasil.channel,
-                previewType: 'PHOTO',
-                thumbnailUrl: hasil.thumb,
-                mediaType: 1,
-                renderLargerThumbnail: true,
-                sourceUrl: text
+    // First try using the primary API
+    try {
+        const hasil = await ytMp3(text); // Your original ytMp3 function
+        XliconStickWait();
+        
+        await replygcxlicon(`*🟢 XLICON MD YT AUDIO DOWNLOADER 🟢*\n\n` +
+                            `*🎬 Title:* ${hasil.title}\n` +
+                            `*💾 Size:* ${hasil.size}\n` +
+                            `*👀 Views:* ${hasil.views ? hasil.views.toLocaleString() : "0"}\n` +
+                            `*👍 Likes:* ${hasil.likes ? hasil.likes.toLocaleString() : "0"}\n` +
+                            `*👎 Dislikes:* ${hasil.dislike ? hasil.dislike.toLocaleString() : "0"}\n` +
+                            `*📺 Channel:* ${hasil.channel}\n` +
+                            `*📅 Uploaded On:* ${hasil.uploadDate}\n\n` +
+                            `*💻 SERVER: KALI LINUX*\n\n` +
+                            `*🔻 DOWNLOADED BY XLICON-V4 🔻*`);
+        
+        await XliconBotInc.sendMessage(m.chat, {
+            audio: { url: hasil.result },
+            mimetype: 'audio/mpeg',
+            contextInfo: {
+                externalAdReply: {
+                    title: hasil.title,
+                    body: hasil.channel,
+                    previewType: 'PHOTO',
+                    thumbnailUrl: hasil.thumb,
+                    mediaType: 1,
+                    renderLargerThumbnail: true,
+                    sourceUrl: text
+                }
             }
+        }, { quoted: m });
+    } catch (error) {
+        console.error('Primary API Error (ytMp3):', error);  // Log the error to the console
+        // If the first API fails, fall back to the Widipe API
+        try {
+            const widipeResponse = await axios.get(`https://widipe.com/download/ytdl?url=${text}`);
+            const widipeResult = widipeResponse.data.result;
+            
+            // Fallback response using Widipe API
+            await replygcxlicon(`*🟢 XLICON MD WIDIPE AUDIO DOWNLOADER 🟢*\n\n` +
+                                `*🎬 Title:* ${widipeResult.title}\n` +
+                                `*👀 Views:* ${widipeResult.views}\n` +
+                                `*📺 Channel:* ${widipeResult.name}\n` +
+                                `*📅 Uploaded:* ${widipeResult.ago}\n\n` +
+                                `*💻 SERVER: KALI LINUX*\n\n` +
+                                `*🔻 DOWNLOADED BY XLICON-V4 🔻*`);
+            
+            await XliconBotInc.sendMessage(m.chat, {
+                audio: { url: widipeResult.mp3 },
+                mimetype: 'audio/mpeg'
+            }, { quoted: m });
+        } catch (err) {
+            console.error('Fallback API Error (Widipe MP3):', err);  // Log the Widipe API error to the console
+            replygcxlicon('Error: Could not download the audio using either API.');
         }
-    }, { quoted: m });
+    }
 }
 break;
-                
+
+
+
 case 'ytmp4': case 'ytvideo': case 'ytplayvideo': {
-    if (!text) return replygcxlicon(`Example: ${prefix + command} url_youtube`);
-    if (!text.includes('youtu')) return replygcxlicon('The link is not a YouTube link!');
-    const hasil = await ytMp4(text);
+    if (!text) return replygcxlicon(`Example: ${prefix + command} youtube_url`);
+    if (!text.includes('youtu')) return replygcxlicon('The URL does not contain results from YouTube!');
+    
     XliconStickWait();
     
-    // Fallback to "0" if values are undefined
-    const views = hasil.views ? hasil.views.toLocaleString() : "0";
-    const likes = hasil.likes ? hasil.likes.toLocaleString() : "0";
-    const dislikes = hasil.dislike ? hasil.dislike.toLocaleString() : "0";
-    
-    await XliconBotInc.sendMessage(m.chat, { 
-        video: { url: hasil.result }, 
-        caption: `*🟢 XLICON MD YT DOWNLOADER 🟢*\n\n` +
-                 `*🎬 Title:* ${hasil.title}\n` +
-                 `*📡 Quality:* ${hasil.quality}\n` +
-                 `*💾 Size:* ${hasil.size}\n` +
-                 `*👀 Views:* ${views}\n` +
-                 `*👍 Likes:* ${likes}\n` +
-                 `*👎 Dislikes:* ${dislikes}\n` +
-                 `*📺 Channel:* ${hasil.channel}\n` +
-                 `*📅 Uploaded On:* ${hasil.uploadDate}\n\n` +
-                 `*💻 SERVER:* KALI LINUX\n\n` + // Added here
-                 `*🔻 DOWNLOADED BY XLICON-V4 🔻*`
-    }, { quoted: m });
+    // First try using the primary API
+    try {
+        const hasil = await ytMp4(text); // Your original ytMp4 function
+        XliconStickWait();
+        
+        const views = hasil.views ? hasil.views.toLocaleString() : "0";
+        const likes = hasil.likes ? hasil.likes.toLocaleString() : "0";
+        const dislikes = hasil.dislike ? hasil.dislike.toLocaleString() : "0";
+        
+        await XliconBotInc.sendMessage(m.chat, {
+            video: { url: hasil.result },
+            caption: `*🟢 XLICON MD YT DOWNLOADER 🟢*\n\n` +
+                     `*🎬 Title:* ${hasil.title}\n` +
+                     `*📡 Quality:* ${hasil.quality}\n` +
+                     `*💾 Size:* ${hasil.size}\n` +
+                     `*👀 Views:* ${views}\n` +
+                     `*👍 Likes:* ${likes}\n` +
+                     `*👎 Dislikes:* ${dislikes}\n` +
+                     `*📺 Channel:* ${hasil.channel}\n` +
+                     `*📅 Uploaded On:* ${hasil.uploadDate}\n\n` +
+                     `*💻 SERVER: KALI LINUX*\n\n` +
+                     `*🔻 DOWNLOADED BY XLICON-V4 🔻*`
+        }, { quoted: m });
+    } catch (error) {
+        console.error('Primary API Error (ytMp4):', error);  // Log the error to the console
+        // If the first API fails, fall back to the Widipe API
+        try {
+            const widipeResponse = await axios.get(`https://widipe.com/download/ytdl?url=${text}`);
+            const widipeResult = widipeResponse.data.result;
+            
+            const caption = `*_DOWNLOADED BY XLICON V4 MD_*\n\n
+    🎬 *Title*: _${widipeResult.title}_\n
+    ⏱️ *Duration*: _${widipeResult.duration}_\n
+    📅 *Uploaded*: _${widipeResult.ago}_\n
+    👁️ *Views*: _${widipeResult.views.toLocaleString()}_\n
+    👤 *Uploader*: _${widipeResult.name}_\n
+    🔗 *Channel*: _${widipeResult.channel}_\n\n
+    *💻 SERVER: KALI LINUX*\n\n` +  // Added server info
+    `*🔻 DOWNLOADED BY XLICON-V4 🔻*`; // Added download info
+
+            await XliconBotInc.sendMessage(m.chat, {
+                video: { url: widipeResult.mp4 },
+                caption: caption,
+                thumbnail: { url: widipeResult.thumbnail }
+            }, { quoted: m });
+        } catch (err) {
+            console.error('Fallback API Error (Widipe MP4):', err);  // Log the Widipe API error to the console
+            replygcxlicon('Error: Could not download the video using either API.');
+        }
+    }
 }
 break;
 
@@ -20859,7 +20958,6 @@ case 'ytv2': {
     }
 }
 break;
-
 
 //----------------------------------------------------------------------------------------------//
 
